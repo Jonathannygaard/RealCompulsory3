@@ -33,7 +33,7 @@ public:
     glm::mat4 getView();
     glm::mat4 getProjection(float width, float height);
     void setPlayerPos(glm::vec3 position);
-    glm::vec3 OrbitCamera(glm::vec3 direction);
+    glm::vec3 OrbitCamera();
 
     void updatePos(glm::vec3 newpos);
 

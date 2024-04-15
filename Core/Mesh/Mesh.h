@@ -46,7 +46,9 @@ public:
 
     void Draw();
 
-    bool FindTerrainHeight(Mesh& Ref, glm::vec3& Player);
+    float calculate_Normal(const glm::vec3&& AB, const glm::vec3&& AC);
+
+    bool FindTerrainHeight(glm::vec3& Player);
 
     void BindBuffers();
 

@@ -9,7 +9,6 @@
 #include "../Color.h"
 
 
-
 void Cube::CreateCube(glm::vec3 position, glm::vec3 scale, glm::vec3 color, bool isPickup, bool isPlayer, glm::vec3 rotation, bool isDoor)
 {
 	Position = position;
@@ -164,7 +163,7 @@ float Mesh::f(float x)
 
 void Mesh::CreateCurve(Mesh ThePlane)
 {
-	for (float i = 2; i < 20; i += 0.1)
+	for (float i = -20; i < 20; i += 0.1)
 	{
 		float x = i;
 		float y = 0;
@@ -172,9 +171,9 @@ void Mesh::CreateCurve(Mesh ThePlane)
 
 
 		glm::vec3 Temp(x, y, z);
-		if (FindTerrainHeight(ThePlane, Temp)) 
+		if (FindTerrainHeight(Temp)) 
 		{
-			mVertices.emplace_back(Temp, glm::vec3(1.f, 0.f, 0.f));
+			mVertices.emplace_back(Temp, Color::Red);
 		}
 
 	}
@@ -231,8 +230,9 @@ void Mesh::Draw()
 	
 	glm::mat4 model(1.f);
 	model = glm::translate(model, glm::vec3(0.f));
-	glUniformMatrix4fv(glGetUniformLocation(Shader::Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(model));
 	glBindVertexArray(VAO);
+	glUniformMatrix4fv(glGetUniformLocation(Shader::Program, "modelMatrix"), 1, GL_FALSE, glm::value_ptr(model));
+	
 	if(!isLine)
 	{
 		glDrawElements(GL_TRIANGLES, tIndices.size()*3, GL_UNSIGNED_INT, nullptr);
@@ -245,50 +245,34 @@ void Mesh::Draw()
 	
 }
 
-bool Mesh::FindTerrainHeight(Mesh& Ref, glm::vec3& Player)
+float Mesh::calculate_Normal(const glm::vec3&& AB, const glm::vec3&& AC)
+{
+	return AB[0] * AC[2] - AC[0] * AB[2];
+}
+
+bool Mesh::FindTerrainHeight(glm::vec3& Player)
 {
 	glm::vec3 p1, p2, p3,player, temp;
-	for(auto Triangle: Ref.tIndices)
+	for(auto Triangle: tIndices)
 	{
-		p1 = Ref.mVertices[Triangle.a].Pos;
-		p2 = Ref.mVertices[Triangle.b].Pos;
-		p3 = Ref.mVertices[Triangle.c].Pos;
+		p1 = mVertices[Triangle.a].Pos;
+		p2 = mVertices[Triangle.b].Pos;
+		p3 = mVertices[Triangle.c].Pos;
 		player = Player;
 
-		temp.y = p1.y;
-		temp.z = p1.z;
-		p1.y = temp.z;
-		p1.z = temp.y;
+		float tArea = glm::length(calculate_Normal(p2-p1, p3-p1));
 
-		temp.y = p2.y;
-		temp.z = p2.z;
-		p2.y = temp.z;
-		p2.z = temp.y;
-
-		temp.y = p3.y;
-		temp.z = p3.z;
-		p3.y = temp.z;
-		p3.z = temp.y;
-
-		temp.y = player.y;
-		temp.z = player.z;
-		player.y = temp.z;
-		player.z = temp.y;
-
-		float tArea = glm::length(glm::cross(p2-p3, p3-p1));
-
-		float u = (glm::cross(p2 - player, p3 - player).z) / tArea;
-		float v = (glm::cross(p3 - player, p1 - player).z) / tArea;
-		float w = (glm::cross(p1 - player, p2 - player).z) / tArea;
-
-		
+		float u = (calculate_Normal(p2 - player, p3 - player)) / tArea;
+		float v = (calculate_Normal(p3 - player, p1 - player)) / tArea;
+		float w = (calculate_Normal(p1 - player, p2 - player)) / tArea;
 
 		if (w >= 0 && v >= 0 && u >= 0)
 		{
 			float xCoord = u * p1.x + v * p2.x + w * p3.x;
 			float yCoord = u * p1.y + v * p2.y + w * p3.y;
 			float zCoord = u * p1.z + v * p2.z + w * p3.z;
-			Player.y = zCoord + 0.5;
+			Player.y = yCoord;
+			std::cout << "Player Y: " << Player.y << std::endl;
 			return true;
 		}
 	}

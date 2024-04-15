@@ -1,6 +1,9 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include "Application.h"
+
+#include <iostream>
+
 #include "glad/glad.h"
 #include <glm/gtc/type_ptr.inl>
 #include "Color.h"
@@ -40,12 +43,12 @@ void Application::create() {
 	Curve.CreateCurve(Terrain);
 	Curve.isLine = true;
 
-	NPC.CreateCube(glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f), Color::Purple);
+	NPC.CreateCube(glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f), Color::Green);
 }
 
 void Application::update() {
 	
-	Terrain.FindTerrainHeight(Terrain, Player.GetPosition());
+	Terrain.FindTerrainHeight(Player.GetPosition());
 
 	if (NPC.GetPosition().z < -20)
 	{
@@ -58,7 +61,9 @@ void Application::update() {
 	NPC.GetPosition().x += NPC.NPCDirection;
 	NPC.GetPosition().z = Mesh::f(NPC.GetPosition().x);
 
-	Terrain.FindTerrainHeight(Terrain, NPC.GetPosition());
+	Terrain.FindTerrainHeight(NPC.GetPosition());
+
+	mCamera.OrbitCamera();
 }
 
 void Application::run() {
@@ -74,15 +79,20 @@ void Application::run() {
 		glClearColor(color.x, color.y, color.z, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT    | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(Shader::Program);
-		KeyBoardInput::processInput(mWindow, &Player);
+		
 		update();
+		
+		std::cout << Player.GetPosition().y << std::endl;
+		
 		glUniformMatrix4fv(mCamera.projectionLoc, 1, GL_FALSE, glm::value_ptr(mCamera.getProjection(Window::Width, Window::Height)));
 		glUniformMatrix4fv(mCamera.viewLoc, 1, GL_FALSE, glm::value_ptr(mCamera.getView()));
-
+		
 		Player.Draw();
 		Terrain.Draw();
 		Curve.Draw();
 		NPC.Draw();
+
+		KeyBoardInput::processInput(mWindow, &Player);
 
 		glfwSwapBuffers(mWindow);
 		glfwPollEvents();

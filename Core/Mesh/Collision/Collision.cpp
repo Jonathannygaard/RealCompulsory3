@@ -123,7 +123,7 @@ bool Collision::checkCollision(Collision& other)
          return true;
     }
     if (HasOverlapped == true && bIsCameraLock == false)
-        Application::mCamera.OrbitCamera(glm::vec3(0.f, 0.f, -1.f));
+        Application::mCamera.OrbitCamera();
     HasOverlapped = false;
 
     return false;
