@@ -70,8 +70,6 @@ void Cube::CreateCube(glm::vec3 position, glm::vec3 scale, glm::vec3 color, bool
 	}
 
 	BindBuffers();
-
-	init();
 }
 
 void Cube::Draw()
@@ -89,6 +87,11 @@ void Cube::Draw()
 void Cube::AddCollider(glm::vec3 scale, ECollisionType collisionType, glm::vec3 offset)
 {
 	Collider = std::make_unique<Collision>(GetPosition()+offset,scale, offset,collisionType,this);
+}
+
+void Cube::MoveNPC(Cube& NPC, glm::vec3 pos)
+{
+	NPC.Position = pos;
 }
 
 Cube::~Cube()
@@ -124,16 +127,6 @@ void Cube::BindBuffers()
 	glBindVertexArray(0);
 }
 
-void Cube::init()
-{
-	/*VAO.init();
-	VBO.init();
-	EBO.init();
-	VBO.Bind(cVertices);
-	EBO.Bind<Triangles>(cIndices);
-	VAO.Activate();*/
-}
-
 
 void Mesh::BindBuffers()
 {
@@ -166,12 +159,12 @@ void Mesh::BindBuffers()
 
 float Mesh::f(float x)
 {
-	return x * x * x - 2 * x * x + 4 * x;
+	return x * x * x - 2 * x;
 }
 
 void Mesh::CreateCurve(Mesh ThePlane)
 {
-	for (float i = 2; i < 10; i += 0.1)
+	for (float i = 2; i < 20; i += 0.1)
 	{
 		float x = i;
 		float y = 0;

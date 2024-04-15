@@ -50,7 +50,7 @@ public:
 
     void BindBuffers();
 
-    float f(float x);
+    static float f(float x);
     void CreateCurve(Mesh ThePlane);
 
     unsigned int VAO;
@@ -77,6 +77,8 @@ public:
     bool bShouldRender = true;
     bool bIsDoor = false;
     bool bDoorInteracted = false;
+
+    float NPCDirection = 1;
     
 
     Cube* OverlappedCube = nullptr;
@@ -90,6 +92,7 @@ public:
     glm::vec3& GetRotation() { return Rotation; }
     int& GetIndex() { return index; }
     void AddCollider(glm::vec3 scale,ECollisionType collisionType, glm::vec3 offset = glm::vec3(0.f));
+    void MoveNPC(Cube& NPC, glm::vec3 pos);
     virtual ~Cube();
 
     void BindBuffers();
@@ -102,8 +105,6 @@ private:
 
     std::vector<Vertex> cVertices;
     std::vector<Triangles> cIndices;
-    void init();
-
 };
 
 

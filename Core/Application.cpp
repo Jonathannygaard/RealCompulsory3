@@ -31,18 +31,34 @@ void Application::create() {
 
 	// Player
 	Player.CreateCube(glm::vec3(0.f, 0.f, 0.f), 
-		glm::vec3(0.75f, 1.3f, 0.75f), Color::Purple, false, true);
+		glm::vec3(0.75f, 1.3f, 0.75f), Color::Purple);
+	Player.bIsPlayer = true;
 
 	Terrain.CreateTerrain(-20,-20,20,20, 0.2);
 	Terrain.isTarrain = true;
 
 	Curve.CreateCurve(Terrain);
 	Curve.isLine = true;
+
+	NPC.CreateCube(glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f), Color::Purple);
 }
 
 void Application::update() {
 	
 	Terrain.FindTerrainHeight(Terrain, Player.GetPosition());
+
+	if (NPC.GetPosition().z < -20)
+	{
+		NPC.NPCDirection = 1*DeltaTime;
+	}
+	if(NPC.GetPosition().z > 20)
+	{
+		NPC.NPCDirection = -1*DeltaTime;
+	}
+	NPC.GetPosition().x += NPC.NPCDirection;
+	NPC.GetPosition().z = Mesh::f(NPC.GetPosition().x);
+
+	Terrain.FindTerrainHeight(Terrain, NPC.GetPosition());
 }
 
 void Application::run() {
@@ -66,6 +82,7 @@ void Application::run() {
 		Player.Draw();
 		Terrain.Draw();
 		Curve.Draw();
+		NPC.Draw();
 
 		glfwSwapBuffers(mWindow);
 		glfwPollEvents();

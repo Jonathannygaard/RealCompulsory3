@@ -22,6 +22,7 @@ public:
     Cube Player;
     Mesh Terrain;
     Mesh Curve;
+    Cube NPC;
 
   
 
